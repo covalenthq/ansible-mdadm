@@ -41,6 +41,27 @@
   - item.state|lower == "present"
   - item.filesystem is defined
 
+# Get UUID of raid device
+- name: arrays | Get UUID of Array(s)
+  ansible.builtin.command:
+    cmd: "blkid -s UUID -o value {{ item.name }}"
+  register: uuid
+  with_items: '{{ mdadm_arrays }}'
+  when:
+  - item.state|lower == "present"
+  - item.filesystem is defined
+  - item.mountpoint is defined
+
+# Mounting raid arrays
+- name: arrays | Mounting Array(s)
+  mount:
+    name: "{{ item.item.mountpoint }}"
+    src: "UUID={{ item.stdout_lines[0] }}"
+    fstype: "{{ item.item.filesystem }}"
+    state: "mounted"
+    opts: "{{ item.item.opts | default(omit) }}"
+  loop: '{{ uuid.results }}'
+
 # Mounting raid arrays
 - name: arrays | Mounting Array(s)
   mount:
