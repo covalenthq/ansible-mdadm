@@ -44,7 +44,7 @@
 # Get UUID of raid device
 - name: arrays | Get UUID of Array(s)
   ansible.builtin.command:
-    cmd: "blkid -s UUID -o value {{ item.name }}"
+    cmd: "lsblk /dev/{{ item.name }} -no UUID"
   register: uuid
   with_items: '{{ mdadm_arrays }}'
   when:
