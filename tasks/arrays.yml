@@ -61,20 +61,6 @@
     opts: "{{ item.item.opts | default(omit) }}"
   loop: '{{ uuid.results }}'
 
-# Mounting raid arrays
-- name: arrays | Mounting Array(s)
-  mount:
-    name: "{{ item.mountpoint }}"
-    src: "/dev/{{ item.name }}"
-    fstype: "{{ item.filesystem }}"
-    state: "mounted"
-    opts: "{{ item.opts | default(omit) }}"
-  with_items: '{{ mdadm_arrays }}'
-  when:
-  - item.state|lower == "present"
-  - item.filesystem is defined
-  - item.mountpoint is defined
-
 # Unmounting raid arrays in preparation of destroying
 - name: arrays | Unmounting Array(s)
   mount:
